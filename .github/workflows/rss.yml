@@ -28,7 +28,7 @@ jobs:
 
       - name: Install libs
         run: |
-          pip install feedparser
+          pip install requests
 
       - name: Generate RSS
         run: |
