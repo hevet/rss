@@ -1,6 +1,7 @@
 import requests
 import json
 import re
+import time
 from html import unescape
 
 RSS_POLSKA = "https://www.polsatnews.pl/rss/polska.xml"
@@ -22,32 +23,50 @@ def clean(text):
 
 def fetch_feed(url):
 
-    response = requests.get(
-        url,
-        headers={
-            "User-Agent": "Mozilla/5.0"
-        },
-        timeout=10
-    )
+    for attempt in range(3):
 
-    xml = response.text
+        try:
 
-    items = []
+            print(f"Pobieranie: {url}")
 
-    matches = re.findall(
-        r'<description><!\[CDATA\[(.*?)\]\]></description>',
-        xml,
-        re.DOTALL
-    )
+            response = requests.get(
+                url,
+                headers={
+                    "User-Agent": "Mozilla/5.0"
+                },
+                timeout=30
+            )
 
-    for m in matches[:MAX_ITEMS]:
+            xml = response.text
 
-        text = clean(m)
+            items = []
 
-        if text:
-            items.append(text)
+            matches = re.findall(
+                r'<description><!\[CDATA\[(.*?)\]\]></description>',
+                xml,
+                re.DOTALL
+            )
 
-    return items
+            for m in matches[:MAX_ITEMS]:
+
+                text = clean(m)
+
+                if text:
+                    items.append(text)
+
+            print(f"Pobrano {len(items)} newsów")
+
+            return items
+
+        except Exception as e:
+
+            print(f"RSS ERROR: {e}")
+
+            if attempt < 2:
+                print("Ponawiam za 5 sekund...")
+                time.sleep(5)
+
+    return []
 
 
 result = {
