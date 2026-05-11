@@ -4,8 +4,8 @@ import re
 import time
 from html import unescape
 
-RSS_POLSKA = "https://www.polsatnews.pl/rss/polska.xml"
-RSS_WORLD = "https://www.polsatnews.pl/rss/swiat.xml"
+RSS_POLSKA = "https://www.rmf24.pl/fakty/feed"
+RSS_WORLD = "https://feeds.bbci.co.uk/news/world/rss.xml"
 
 MAX_ITEMS = 5
 
