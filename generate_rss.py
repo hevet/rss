@@ -1,7 +1,7 @@
-import feedparser
+import requests
 import json
-from html import unescape
 import re
+from html import unescape
 
 RSS_POLSKA = "https://www.polsatnews.pl/rss/polska.xml"
 RSS_WORLD = "https://www.polsatnews.pl/rss/swiat.xml"
@@ -22,15 +22,27 @@ def clean(text):
 
 def fetch_feed(url):
 
-    feed = feedparser.parse(url)
+    response = requests.get(
+        url,
+        headers={
+            "User-Agent": "Mozilla/5.0"
+        },
+        timeout=10
+    )
+
+    xml = response.text
 
     items = []
 
-    for entry in feed.entries[:MAX_ITEMS]:
+    matches = re.findall(
+        r'<description><!\[CDATA\[(.*?)\]\]></description>',
+        xml,
+        re.DOTALL
+    )
 
-        text = entry.get("description", "")
+    for m in matches[:MAX_ITEMS]:
 
-        text = clean(text)
+        text = clean(m)
 
         if text:
             items.append(text)
